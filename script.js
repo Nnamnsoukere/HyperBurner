@@ -1,1 +1,15 @@
-
+const $=s=>document.querySelector(s);const $$=s=>document.querySelectorAll(s);
+const cursor=$('.cursor-glow');addEventListener('pointermove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'});
+const io=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('visible')),{threshold:.12});$$('.reveal').forEach(x=>io.observe(x));
+$$('[data-count]').forEach(el=>{const end=+el.dataset.count;let start=0;const obs=new IntersectionObserver(([e])=>{if(!e.isIntersecting)return;obs.disconnect();const t=performance.now();const dur=1500;function tick(n){const p=Math.min(1,(n-t)/dur);const q=1-Math.pow(1-p,4);el.textContent=Math.round(end*q).toLocaleString();if(p<1)requestAnimationFrame(tick)}requestAnimationFrame(tick)},{threshold:.8});obs.observe(el)});
+$('#year').textContent=new Date().getFullYear();
+// Continuous canvas particle engine: bills fly from the gun, then ignite and disappear.
+const c=$('#moneyCanvas'),ctx=c.getContext('2d');let W,H,DPR,parts=[];function resize(){DPR=Math.min(devicePixelRatio||1,2);W=c.clientWidth;H=c.clientHeight;c.width=W*DPR;c.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0)}addEventListener('resize',resize);resize();
+function spawn(){const gunX=W*.77,gunY=H*.49;parts.push({x:gunX,y:gunY,vx:-(Math.random()*1.1+.7),vy:(Math.random()-.5)*1.5-.15,rot:(Math.random()-.5)*.5,spin:(Math.random()-.5)*.12,life:0,max:70+Math.random()*55,size:13+Math.random()*8,burn:Math.random()>.35});}
+let last=0;function frame(t){const dt=Math.min(32,t-last||16);last=t;if(parts.length<26)for(let i=0;i<2;i++)spawn();ctx.clearRect(0,0,W,H);for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.life+=dt/16;p.x+=p.vx*dt/1.7;p.y+=p.vy*dt/1.7;p.vy+=.012;p.rot+=p.spin;const a=Math.max(0,1-p.life/p.max);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);if(p.burn){ctx.shadowBlur=18;ctx.shadowColor='rgba(255,80,20,.9)';ctx.fillStyle='rgba(255,236,173,'+a*.9+')'}else{ctx.fillStyle='rgba(238,238,238,'+a*.82+')'}ctx.fillRect(-p.size*.7,-p.size*.4,p.size*1.4,p.size*.8);ctx.shadowBlur=0;ctx.strokeStyle='rgba(20,20,20,.65)';ctx.lineWidth=1;ctx.strokeRect(-p.size*.7,-p.size*.4,p.size*1.4,p.size*.8);ctx.fillStyle='rgba(255,90,20,'+a*.9+')';ctx.font='bold '+Math.max(8,p.size*.55)+'px Inter';ctx.textAlign='center';ctx.fillText('$',0,3);if(p.burn&&p.life>p.max*.45){ctx.globalAlpha=a;ctx.fillStyle='#ff5b17';ctx.beginPath();ctx.arc(0,-p.size*.65,Math.random()*4+2,0,Math.PI*2);ctx.fill()}ctx.restore();if(p.life>p.max||p.x<-30)parts.splice(i,1)}requestAnimationFrame(frame)}requestAnimationFrame(frame);
+// gun recoil and flash synced to a visible firing rhythm
+const gun=$('.cat-wrap'),flash=$('.gun-flash');setInterval(()=>{gun.animate([{transform:'translate(-50%,-46%) scale(1)'},{transform:'translate(calc(-50% - 5px),-46%) scale(1.012)'},{transform:'translate(-50%,-46%) scale(1)'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'});flash.animate([{opacity:0,transform:'scale(.3)'},{opacity:1,transform:'scale(1.35)'},{opacity:0,transform:'scale(2)'}],{duration:520});},1250);
+// decorative impact particles
+$$('.impact span').forEach((s,i)=>{s.style.setProperty('--x',(45+i*24)+'px');s.style.setProperty('--y',(-30-i*18)+'px')});
+// header shrink
+addEventListener('scroll',()=>document.querySelector('.nav').style.background=scrollY>30?'rgba(8,8,8,.92)':'rgba(10,10,10,.72)');
