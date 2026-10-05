@@ -1,291 +1,1096 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HyperBurner | Solana Meme Coin</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050000">
+<title>HyperBurner — Built To Burn</title>
 
-    body {
-      font-family: 'Arial', sans-serif;
-      background: #0a0a0a;
-      color: white;
-      overflow-x: hidden;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-    /* Fire background effect */
-    .fire-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(ellipse at bottom, #ff4500 0%, #1a0000 40%, #000 100%);
-      z-index: -2;
-    }
+html{
+  scroll-behavior:smooth;
+  background:#030000;
+}
 
-    .embers {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 50% 10%,rgba(255,70,0,.18),transparent 30%),
+    radial-gradient(circle at 20% 50%,rgba(255,20,0,.08),transparent 30%),
+    #030000;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
 
-    .ember {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: #ff6b00;
-      border-radius: 50%;
-      box-shadow: 0 0 10px #ff4500;
-      animation: rise 4s infinite linear;
-    }
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:2;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 4px,
+      rgba(255,80,0,.018) 5px
+    );
+  mix-blend-mode:screen;
+}
 
-    @keyframes rise {
-      0% { transform: translateY(100vh) scale(1); opacity: 1; }
-      100% { transform: translateY(-10vh) scale(0); opacity: 0; }
-    }
+#scene{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:20;
+  pointer-events:none;
+}
 
-    /* Navigation */
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 5%;
-      position: fixed;
-      width: 100%;
-      top: 0;
-      z-index: 100;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(10px);
-    }
+#rain{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:25;
+}
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 1.6rem;
-      font-weight: bold;
-    }
+.bill{
+  position:absolute;
+  width:72px;
+  height:34px;
+  border:1px solid rgba(255,220,120,.55);
+  border-radius:4px;
+  background:
+    linear-gradient(135deg,
+      #8b5420,
+      #e5b84e 35%,
+      #fff0a1 50%,
+      #b96b20 70%,
+      #54200b);
+  box-shadow:
+    0 0 8px rgba(255,120,0,.5),
+    0 0 25px rgba(255,40,0,.18);
+  opacity:.8;
+  transform-style:preserve-3d;
+}
 
-    .logo img {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-    }
+.bill:before{
+  content:"HB";
+  position:absolute;
+  inset:4px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(80,20,0,.45);
+  color:#351000;
+  font-size:13px;
+  font-weight:900;
+}
 
-    .nav-links a {
-      color: white;
-      text-decoration: none;
-      margin-left: 30px;
-      font-weight: 500;
-      transition: color 0.3s;
-    }
+.bill:after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-13px;
+  width:22px;
+  height:22px;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:
+    radial-gradient(circle,
+      #fffbd0 0%,
+      #ffcf31 22%,
+      #ff5a00 48%,
+      rgba(255,0,0,0) 72%);
+  filter:blur(2px);
+  opacity:.75;
+}
 
-    .nav-links a:hover {
-      color: #ff6b00;
-    }
+.bill.burning{
+  box-shadow:
+    0 0 12px #ffb000,
+    0 0 30px #ff3900,
+    0 0 55px rgba(255,0,0,.5);
+}
 
-    /* Hero Section */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 120px 5% 60px;
-      gap: 40px;
-    }
+#fireAtmosphere{
+  position:fixed;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+  overflow:hidden;
+}
 
-    .hero-content {
-      max-width: 600px;
-    }
+.flame{
+  position:absolute;
+  bottom:-80px;
+  width:180px;
+  height:300px;
+  border-radius:50% 50% 35% 35%;
+  background:
+    radial-gradient(
+      ellipse at 50% 100%,
+      #fff7a0 0%,
+      #ffc400 15%,
+      #ff5a00 40%,
+      #e50000 62%,
+      transparent 75%
+    );
+  filter:blur(10px);
+  opacity:.38;
+  transform-origin:bottom center;
+  animation:flameDance 1.2s ease-in-out infinite alternate;
+}
 
-    .hero h1 {
-      font-size: 4.5rem;
-      line-height: 1.1;
-      margin-bottom: 20px;
-      background: linear-gradient(90deg, #fff, #ff6b00);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+.flame:nth-child(1){left:-30px;animation-delay:-.2s}
+.flame:nth-child(2){left:15%;height:360px;animation-delay:-.8s}
+.flame:nth-child(3){left:35%;height:270px;animation-delay:-.4s}
+.flame:nth-child(4){left:55%;height:390px;animation-delay:-1s}
+.flame:nth-child(5){left:78%;height:310px;animation-delay:-.6s}
+.flame:nth-child(6){right:-50px;height:360px;animation-delay:-.3s}
 
-    .hero p {
-      font-size: 1.25rem;
-      opacity: 0.9;
-      margin-bottom: 30px;
-    }
+@keyframes flameDance{
+  from{
+    transform:scaleX(.75) skewX(-5deg) translateY(15px);
+    opacity:.25;
+  }
+  to{
+    transform:scaleX(1.15) skewX(7deg) translateY(-20px);
+    opacity:.55;
+  }
+}
 
-    .buttons {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
+.fireline{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  height:90px;
+  z-index:30;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at center bottom,
+      #fff 0%,
+      #ffbd00 7%,
+      #ff4d00 24%,
+      #e00000 42%,
+      transparent 70%);
+  filter:blur(14px);
+  animation:firePulse .7s ease-in-out infinite alternate;
+}
 
-    .btn {
-      padding: 16px 36px;
-      border-radius: 50px;
-      font-weight: bold;
-      text-decoration: none;
-      transition: all 0.3s;
-    }
+@keyframes firePulse{
+  from{transform:scaleY(.7);opacity:.55}
+  to{transform:scaleY(1.25);opacity:.95}
+}
 
-    .btn-primary {
-      background: linear-gradient(90deg, #ff4500, #ff6b00);
-      color: white;
-    }
+#site{
+  position:relative;
+  z-index:10;
+}
 
-    .btn-primary:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 30px #ff4500;
-    }
+.nav{
+  position:fixed;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(1100px,calc(100% - 30px));
+  padding:13px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border:1px solid rgba(255,120,30,.25);
+  border-radius:18px;
+  background:rgba(5,2,1,.72);
+  backdrop-filter:blur(18px);
+  box-shadow:
+    0 0 35px rgba(255,50,0,.15),
+    inset 0 0 20px rgba(255,100,0,.04);
+  z-index:100;
+}
 
-    .btn-secondary {
-      background: transparent;
-      border: 2px solid #ff6b00;
-      color: white;
-    }
+.logo{
+  font-size:20px;
+  font-weight:1000;
+  letter-spacing:-1px;
+}
 
-    .hero-image {
-      max-width: 500px;
-      width: 100%;
-    }
+.logo span{
+  color:#ff6500;
+  text-shadow:0 0 18px #ff3b00;
+}
 
-    .hero-image img {
-      width: 100%;
-      filter: drop-shadow(0 0 40px #ff4500);
-      animation: float 4s ease-in-out infinite;
-    }
+.navlinks{
+  display:flex;
+  gap:22px;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+}
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
-    }
+.navlinks a{
+  color:#fff;
+  text-decoration:none;
+  opacity:.7;
+}
 
-    /* Stats */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      padding: 40px 5%;
-      background: rgba(0,0,0,0.5);
-    }
+.navlinks a:hover{
+  opacity:1;
+  color:#ff8a00;
+}
 
-    .stat-box {
-      text-align: center;
-      padding: 25px;
-      border: 1px solid #ff450033;
-      border-radius: 16px;
-      background: rgba(255,69,0,0.05);
-    }
+.announcement{
+  position:relative;
+  margin:115px auto 0;
+  width:min(1100px,calc(100% - 30px));
+  overflow:hidden;
+  border:1px solid rgba(255,100,0,.3);
+  border-radius:12px;
+  background:rgba(20,5,0,.75);
+  box-shadow:0 0 30px rgba(255,40,0,.12);
+}
 
-    .stat-box h3 {
-      font-size: 1.8rem;
-      color: #ff6b00;
-    }
+.ticker{
+  display:flex;
+  width:max-content;
+  padding:13px 0;
+  animation:tickerMove 22s linear infinite;
+}
 
-    /* Responsive */
-    @media (max-width: 900px) {
-      .hero {
-        flex-direction: column;
-        text-align: center;
-      }
-      .hero h1 {
-        font-size: 3rem;
-      }
-      .nav-links {
-        display: none;
-      }
-    }
-  </style>
+.ticker span{
+  margin:0 30px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:2px;
+  white-space:nowrap;
+}
+
+.ticker span:first-child{
+  color:#ff8a00;
+}
+
+@keyframes tickerMove{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+
+.hero{
+  min-height:850px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:90px 20px 100px;
+  overflow:hidden;
+}
+
+.heroGlow{
+  position:absolute;
+  width:700px;
+  height:700px;
+  border-radius:50%;
+  background:radial-gradient(circle,#ff4a00 0%,rgba(255,50,0,.18) 35%,transparent 70%);
+  filter:blur(35px);
+  animation:heroGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes heroGlow{
+  from{transform:scale(.85);opacity:.45}
+  to{transform:scale(1.15);opacity:.8}
+}
+
+.heroContent{
+  width:min(1150px,100%);
+  display:grid;
+  grid-template-columns:1fr 1.05fr;
+  gap:40px;
+  align-items:center;
+  position:relative;
+  z-index:5;
+}
+
+.kicker{
+  color:#ff7800;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:4px;
+  margin-bottom:18px;
+  text-shadow:0 0 15px #ff3b00;
+}
+
+h1{
+  font-size:clamp(65px,9vw,125px);
+  line-height:.82;
+  letter-spacing:-7px;
+  font-weight:1000;
+  text-transform:uppercase;
+  text-shadow:
+    0 0 20px rgba(255,60,0,.5),
+    0 0 60px rgba(255,30,0,.3);
+}
+
+h1 span{
+  display:block;
+  color:#ff5b00;
+  text-shadow:
+    0 0 15px #ffcc33,
+    0 0 35px #ff4b00,
+    0 0 80px #ff1900;
+}
+
+.heroText{
+  max-width:600px;
+  margin-top:28px;
+  color:#d2c5bd;
+  font-size:17px;
+  line-height:1.7;
+}
+
+.buttons{
+  display:flex;
+  gap:14px;
+  margin-top:30px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:15px 22px;
+  border-radius:12px;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  transition:.25s;
+}
+
+.btn.fire{
+  color:#160500;
+  background:linear-gradient(135deg,#fff08a,#ff7800,#ff2500);
+  box-shadow:
+    0 0 20px rgba(255,80,0,.55),
+    0 0 50px rgba(255,30,0,.25);
+}
+
+.btn.fire:hover{
+  transform:translateY(-4px) scale(1.03);
+  box-shadow:
+    0 0 35px rgba(255,150,0,.8),
+    0 0 80px rgba(255,30,0,.45);
+}
+
+.btn.dark{
+  color:#fff;
+  border:1px solid rgba(255,130,50,.3);
+  background:rgba(255,255,255,.04);
+}
+
+.heroArtWrap{
+  position:relative;
+  min-height:570px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#heroArt{
+  position:relative;
+  width:min(620px,100%);
+  max-height:620px;
+  object-fit:contain;
+  border-radius:30px;
+  z-index:5;
+  filter:
+    saturate(1.35)
+    contrast(1.1)
+    drop-shadow(0 0 15px rgba(255,80,0,.8))
+    drop-shadow(0 0 50px rgba(255,30,0,.55));
+  animation:
+    catFloat 3s ease-in-out infinite,
+    catFire 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes catFloat{
+  0%,100%{transform:translateY(12px) rotate(-1deg)}
+  50%{transform:translateY(-18px) rotate(1deg)}
+}
+
+@keyframes catFire{
+  from{filter:saturate(1.2) contrast(1.05) drop-shadow(0 0 12px rgba(255,80,0,.7)) drop-shadow(0 0 35px rgba(255,30,0,.4))}
+  to{filter:saturate(1.55) contrast(1.15) drop-shadow(0 0 25px #ff8a00) drop-shadow(0 0 70px #ff2500)}
+}
+
+.muzzle{
+  position:absolute;
+  left:5%;
+  top:45%;
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#ffe36a 8%,#ff7500 25%,#ff1800 45%,transparent 72%);
+  filter:blur(3px);
+  z-index:8;
+  animation:muzzleFlash .55s steps(2) infinite;
+  mix-blend-mode:screen;
+}
+
+@keyframes muzzleFlash{
+  0%,60%{transform:scale(.3);opacity:.1}
+  70%{transform:scale(1.4);opacity:1}
+  100%{transform:scale(.55);opacity:.25}
+}
+
+.shockwave{
+  position:absolute;
+  left:8%;
+  top:47%;
+  width:100px;
+  height:100px;
+  border:2px solid #ff8a00;
+  border-radius:50%;
+  z-index:7;
+  animation:shock 1s ease-out infinite;
+}
+
+@keyframes shock{
+  0%{transform:scale(.2);opacity:1}
+  100%{transform:scale(4);opacity:0}
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:42px;
+  max-width:620px;
+}
+
+.stat{
+  padding:18px;
+  border:1px solid rgba(255,100,0,.18);
+  border-radius:14px;
+  background:rgba(255,70,0,.035);
+  box-shadow:inset 0 0 25px rgba(255,60,0,.025);
+}
+
+.stat strong{
+  display:block;
+  font-size:24px;
+  color:#ff9b21;
+}
+
+.stat small{
+  color:#857870;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-size:9px;
+}
+
+.section{
+  position:relative;
+  width:min(1100px,calc(100% - 30px));
+  margin:auto;
+  padding:120px 0;
+}
+
+.sectionTitle{
+  font-size:clamp(38px,6vw,75px);
+  letter-spacing:-4px;
+  text-transform:uppercase;
+  line-height:.9;
+}
+
+.sectionTitle span{
+  color:#ff6200;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin-top:45px;
+}
+
+.card{
+  position:relative;
+  overflow:hidden;
+  min-height:230px;
+  padding:30px;
+  border:1px solid rgba(255,90,0,.2);
+  border-radius:20px;
+  background:
+    linear-gradient(145deg,rgba(255,70,0,.07),rgba(0,0,0,.5));
+  box-shadow:
+    0 0 35px rgba(255,30,0,.08),
+    inset 0 0 30px rgba(255,60,0,.025);
+}
+
+.card:before{
+  content:"";
+  position:absolute;
+  left:-30%;
+  right:-30%;
+  bottom:-80px;
+  height:130px;
+  background:radial-gradient(ellipse,#ff4a00,transparent 65%);
+  filter:blur(18px);
+  animation:cardFire 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes cardFire{
+  from{transform:translateY(15px);opacity:.3}
+  to{transform:translateY(-10px);opacity:.8}
+}
+
+.card>*{
+  position:relative;
+  z-index:2;
+}
+
+.cardNumber{
+  color:#ff6500;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+.card h3{
+  margin-top:60px;
+  font-size:25px;
+}
+
+.card p{
+  margin-top:12px;
+  color:#91847d;
+  line-height:1.6;
+  font-size:14px;
+}
+
+.tokenBox{
+  margin-top:45px;
+  padding:40px;
+  border:1px solid rgba(255,90,0,.25);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 80% 30%,rgba(255,50,0,.14),transparent 35%),
+    rgba(10,2,0,.8);
+  box-shadow:0 0 70px rgba(255,40,0,.1);
+}
+
+.bigNumber{
+  font-size:clamp(60px,10vw,130px);
+  font-weight:1000;
+  letter-spacing:-7px;
+  color:#fff;
+  text-shadow:0 0 40px #ff3a00;
+}
+
+.bigNumber span{
+  color:#ff6500;
+}
+
+.tokenRows{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:30px;
+}
+
+.tokenRow{
+  padding:20px;
+  border-radius:14px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,100,0,.12);
+}
+
+.tokenRow strong{
+  display:block;
+  color:#ff8b1f;
+  font-size:20px;
+}
+
+.tokenRow small{
+  display:block;
+  margin-top:8px;
+  color:#80756e;
+  line-height:1.4;
+}
+
+.announcementBox{
+  margin-top:45px;
+  padding:30px;
+  border-left:3px solid #ff5700;
+  background:rgba(255,50,0,.05);
+}
+
+.announcementBox h3{
+  color:#ff7900;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  margin-bottom:10px;
+}
+
+.announcementBox p{
+  color:#b4a8a1;
+  line-height:1.7;
+}
+
+.final{
+  min-height:700px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  overflow:hidden;
+}
+
+.final h2{
+  font-size:clamp(65px,11vw,150px);
+  line-height:.8;
+  letter-spacing:-8px;
+  text-transform:uppercase;
+  text-shadow:
+    0 0 20px #ff6b00,
+    0 0 70px #ff2800,
+    0 0 130px rgba(255,0,0,.5);
+}
+
+.final h2 span{
+  color:#ff5d00;
+}
+
+.footer{
+  padding:35px 20px 80px;
+  text-align:center;
+  color:#685d57;
+  font-size:10px;
+  letter-spacing:2px;
+}
+
+.reveal{
+  opacity:0;
+  transform:translateY(50px);
+  transition:1s ease;
+}
+
+.reveal.in{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.fireText{
+  animation:textFire 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes textFire{
+  from{text-shadow:0 0 10px #ff5500}
+  to{text-shadow:0 0 25px #ffb000,0 0 60px #ff2b00}
+}
+
+@media(max-width:800px){
+  .navlinks{display:none}
+
+  .hero{
+    min-height:auto;
+    padding-top:80px;
+  }
+
+  .heroContent{
+    grid-template-columns:1fr;
+  }
+
+  .heroArtWrap{
+    min-height:420px;
+    order:-1;
+  }
+
+  #heroArt{
+    width:100%;
+  }
+
+  h1{
+    font-size:68px;
+    letter-spacing:-4px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .tokenRows{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .section{
+    padding:80px 0;
+  }
+
+  .final{
+    min-height:500px;
+  }
+}
+
+@media(max-width:500px){
+  .announcement{
+    margin-top:100px;
+  }
+
+  .hero{
+    padding-left:15px;
+    padding-right:15px;
+  }
+
+  h1{
+    font-size:57px;
+  }
+
+  .heroText{
+    font-size:15px;
+  }
+
+  .heroArtWrap{
+    min-height:330px;
+  }
+
+  .tokenRows{
+    grid-template-columns:1fr;
+  }
+
+  .tokenBox{
+    padding:25px;
+  }
+
+  .bigNumber{
+    font-size:65px;
+  }
+
+  .final h2{
+    font-size:70px;
+    letter-spacing:-4px;
+  }
+}
+</style>
 </head>
-<body>
-  <div class="fire-bg"></div>
-  <div class="embers" id="embers"></div>
 
-  <nav>
-    <div class="logo">
-      <img src="YOUR_LOGO_CAT_URL_HERE" alt="HyperBurner Logo">
-      HyperBurner
-    </div>
-    <div class="nav-links">
-      <a href="#">Home</a>
+<body>
+
+<div id="fireAtmosphere">
+  <div class="flame"></div>
+  <div class="flame"></div>
+  <div class="flame"></div>
+  <div class="flame"></div>
+  <div class="flame"></div>
+  <div class="flame"></div>
+</div>
+
+<div class="fireline"></div>
+
+<canvas id="scene"></canvas>
+<div id="rain"></div>
+
+<div id="site">
+
+  <nav class="nav">
+    <div class="logo">HYPER<span>BURNER</span></div>
+
+    <div class="navlinks">
+      <a href="#thesis">Thesis</a>
       <a href="#tokenomics">Tokenomics</a>
-      <a href="#airdrop">Airdrop</a>
-      <a href="#">Roadmap</a>
-      <a href="#">Community</a>
+      <a href="#airdrop">Airdrops</a>
+      <a href="#transparency">Transparency</a>
     </div>
   </nav>
 
-  <section class="hero">
-    <div class="hero-content">
-      <h1>HYPERBURNER</h1>
-      <p>A community-driven Solana token with real utility — no taxes, no tricks. Just a movement built on transparency, unity and long-term value.</p>
-      <div class="buttons">
-        <a href="#" class="btn btn-primary">Buy on Raydium</a>
-        <a href="#tokenomics" class="btn btn-secondary">View Tokenomics</a>
+  <div class="announcement">
+    <div class="ticker">
+      <span>🔥 THE SUPPLY IS FIXED</span>
+      <span>5,000,000 HB</span>
+      <span>🔥 0% TRANSACTION TAX</span>
+      <span>AIRDROP REWARDS</span>
+      <span>🔥 VERIFY BEFORE YOU TRUST</span>
+      <span>🔥 THE SUPPLY IS FIXED</span>
+      <span>5,000,000 HB</span>
+      <span>🔥 0% TRANSACTION TAX</span>
+    </div>
+  </div>
+
+  <main>
+
+    <section class="hero" id="hero">
+
+      <div class="heroGlow"></div>
+
+      <div class="heroContent">
+
+        <div class="reveal">
+
+          <div class="kicker">HYPERBURNER / LIVE FIRE</div>
+
+          <h1>
+            BUILT
+            <span class="fireText">TO BURN.</span>
+          </h1>
+
+          <p class="heroText">
+            HyperBurner is a 5,000,000 HB token built around a simple
+            principle: keep the supply visible, keep the claims honest,
+            and reward participation through airdrops.
+          </p>
+
+          <div class="buttons">
+            <a href="#thesis" class="btn fire">Explore The Fire</a>
+            <a href="#transparency" class="btn dark">Read The Facts</a>
+          </div>
+
+          <div class="stats">
+
+            <div class="stat">
+              <strong>5M</strong>
+              <small>Total HB Supply</small>
+            </div>
+
+            <div class="stat">
+              <strong>0%</strong>
+              <small>Transaction Tax</small>
+            </div>
+
+            <div class="stat">
+              <strong>AIRDROPS</strong>
+              <small>Current Reward Model</small>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="heroArtWrap">
+
+          <div class="muzzle"></div>
+          <div class="shockwave"></div>
+
+          <img
+            id="heroArt"
+            src="hero-cat-moneygun.jpeg"
+            alt="HyperBurner cat firing a money gun"
+          >
+
+        </div>
+
       </div>
-    </div>
-    <div class="hero-image">
-      <img src="YOUR_CENTER_CAT_URL_HERE" alt="HyperBurner Cat">
-    </div>
-  </section>
+    </section>
 
-  <section class="stats">
-    <div class="stat-box">
-      <h3>5,000,000</h3>
-      <p>Total Supply</p>
-    </div>
-    <div class="stat-box">
-      <h3>1,100,000</h3>
-      <p>Airdrop Pool</p>
-    </div>
-    <div class="stat-box">
-      <h3>0%</h3>
-      <p>Transaction Tax</p>
-    </div>
-    <div class="stat-box">
-      <h3>2,000</h3>
-      <p>Min Holding</p>
-    </div>
-  </section>
+    <section class="section reveal" id="thesis">
 
-  <!-- You can add Tokenomics + Airdrop sections below the same way -->
+      <div class="kicker">THE THESIS</div>
 
-  <script>
-    // Create rising embers
-    const embersContainer = document.getElementById('embers');
-    for (let i = 0; i < 60; i++) {
-      const ember = document.createElement('div');
-      ember.classList.add('ember');
-      ember.style.left = Math.random() * 100 + 'vw';
-      ember.style.animationDuration = (3 + Math.random() * 5) + 's';
-      ember.style.animationDelay = Math.random() * 5 + 's';
-      embersContainer.appendChild(ember);
-    }
+      <h2 class="sectionTitle">
+        SIMPLE.<br>
+        <span>VISIBLE.</span><br>
+        VERIFIABLE.
+      </h2>
 
-    // Simple GSAP animations
-    gsap.from(".hero-content", { opacity: 0, x: -80, duration: 1.2, ease: "power3.out" });
-    gsap.from(".hero-image", { opacity: 0, x: 80, duration: 1.2, ease: "power3.out", delay: 0.2 });
-    gsap.from(".stat-box", {
-      opacity: 0,
-      y: 40,
-      duration: 0.8,
-      stagger: 0.15,
-      scrollTrigger: {
-        trigger: ".stats",
-        start: "top 80%"
-      }
-    });
-  </script>
+      <div class="grid">
+
+        <article class="card">
+          <div class="cardNumber">01 / SUPPLY</div>
+          <h3>Fixed Supply</h3>
+          <p>
+            HyperBurner has a stated total supply of 5,000,000 HB.
+            The number should be easy to understand and easy to verify.
+          </p>
+        </article>
+
+        <article class="card">
+          <div class="cardNumber">02 / TAX</div>
+          <h3>Zero Tax</h3>
+          <p>
+            HyperBurner currently presents a 0% transaction tax.
+            No hidden tax mechanism is presented here.
+          </p>
+        </article>
+
+        <article class="card">
+          <div class="cardNumber">03 / REWARDS</div>
+          <h3>Airdrop Rewards</h3>
+          <p>
+            The current confirmed reward model is based around
+            airdrop distributions.
+          </p>
+        </article>
+
+      </div>
+
+    </section>
+
+    <section class="section reveal" id="tokenomics">
+
+      <div class="kicker">TOKENOMICS</div>
+
+      <h2 class="sectionTitle">
+        KNOW WHERE<br>
+        <span>EVERY TOKEN</span><br>
+        GOES.
+      </h2>
+
+      <div class="tokenBox">
+
+        <div class="bigNumber">
+          <span data-count="5000000">0</span>
+          <small style="font-size:20px;letter-spacing:1px;">HB</small>
+        </div>
+
+        <div class="tokenRows">
+
+          <div class="tokenRow">
+            <strong>32%</strong>
+            <small>Initial Public Burn<br>1,600,000 HB</small>
+          </div>
+
+          <div class="tokenRow">
+            <strong>42%</strong>
+            <small>Liquidity Pool<br>2,100,000 HB</small>
+          </div>
+
+          <div class="tokenRow">
+            <strong>22%</strong>
+            <small>Post-Launch Airdrop<br>1,100,000 HB</small>
+          </div>
+
+          <div class="tokenRow">
+            <strong>4%</strong>
+            <small>Community / Ecosystem<br>200,000 HB</small>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="section reveal" id="airdrop">
+
+      <div class="kicker">AIRDROP REWARDS</div>
+
+      <h2 class="sectionTitle">
+        PARTICIPATE.<br>
+        <span>GET REWARDED.</span>
+      </h2>
+
+      <div class="grid">
+
+        <article class="card">
+          <div class="cardNumber">$1M MILESTONE</div>
+          <h3>250,000 HB</h3>
+          <p>
+            A planned milestone allocation within the airdrop reward pool.
+          </p>
+        </article>
+
+        <article class="card">
+          <div class="cardNumber">$3M MILESTONE</div>
+          <h3>150,000 HB</h3>
+          <p>
+            A planned milestone allocation within the airdrop reward pool.
+          </p>
+        </article>
+
+        <article class="card">
+          <div class="cardNumber">$5M MILESTONE</div>
+          <h3>200,000 HB</h3>
+          <p>
+            A planned milestone allocation within the airdrop reward pool.
+          </p>
+        </article>
+
+      </div>
+
+    </section>
+
+    <section class="section reveal" id="transparency">
+
+      <div class="kicker">TRANSPARENCY CENTER</div>
+
+      <h2 class="sectionTitle">
+        DON'T<br>
+        <span>TRUST US.</span><br>
+        VERIFY.
+      </h2>
+
+      <div class="announcementBox">
+
+        <h3>What is confirmed</h3>
+
+        <p>
+          Total stated supply: 5,000,000 HB.
+          Transaction tax presented on this website: 0%.
+          Current confirmed reward model: airdrop rewards.
+          Contract, burn and treasury addresses should be published
+          here once they are formally established and ready for
+          independent verification.
+        </p>
+
+      </div>
+
+    </section>
+
+    <section class="final reveal">
+
+      <div>
+
+        <div class="kicker">HYPERBURNER</div>
+
+        <h2>
+          LET IT<br>
+          <span>BURN.</span>
+        </h2>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    5,000,000 HB &nbsp;·&nbsp; 0% TAX &nbsp;·&nbsp; AIRDROP REWARDS
+  </footer>
+
+</div>
+
+<script>
+/*
+  Safety check:
+  This confirms that the HTML contains every element
+  required by the existing HyperBurner animation engine.
+*/
+
+window.addEventListener("load", function(){
+
+  console.log("🔥 HYPERBURNER HTML LOADED");
+
+  console.log({
+    scene: !!document.getElementById("scene"),
+    rain: !!document.getElementById("rain"),
+    heroArt: !!document.getElementById("heroArt"),
+    counter: !!document.querySelector("[data-count]"),
+    revealSections: document.querySelectorAll(".reveal").length
+  });
+
+  document.body.classList.add("loaded");
+
+});
+</script>
+
 </body>
 </html>
