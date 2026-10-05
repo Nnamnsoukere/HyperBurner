@@ -14,35 +14,41 @@
     }
 
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       background: #0a0a0a;
       color: white;
       overflow-x: hidden;
-      line-height: 1.6;
     }
 
+    /* Fire background effect */
     .fire-bg {
       position: fixed;
-      inset: 0;
-      background: radial-gradient(ellipse at bottom, #ff4500 0%, #1a0500 35%, #000 100%);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at bottom, #ff4500 0%, #1a0000 40%, #000 100%);
       z-index: -2;
     }
 
     .embers {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
       z-index: -1;
     }
 
     .ember {
       position: absolute;
-      width: 3px;
-      height: 3px;
+      width: 4px;
+      height: 4px;
       background: #ff6b00;
       border-radius: 50%;
-      box-shadow: 0 0 8px #ff4500;
-      animation: rise linear infinite;
+      box-shadow: 0 0 10px #ff4500;
+      animation: rise 4s infinite linear;
     }
 
     @keyframes rise {
@@ -50,86 +56,87 @@
       100% { transform: translateY(-10vh) scale(0); opacity: 0; }
     }
 
+    /* Navigation */
     nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 18px 5%;
+      padding: 20px 5%;
       position: fixed;
       width: 100%;
       top: 0;
       z-index: 100;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(12px);
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
     }
 
     .logo {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.6rem;
+      font-weight: bold;
     }
 
     .logo img {
-      width: 42px;
-      height: 42px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
     }
 
     .nav-links a {
       color: white;
       text-decoration: none;
-      margin-left: 28px;
+      margin-left: 30px;
       font-weight: 500;
-      transition: 0.3s;
+      transition: color 0.3s;
     }
 
     .nav-links a:hover {
       color: #ff6b00;
     }
 
+    /* Hero Section */
     .hero {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 140px 5% 80px;
-      gap: 50px;
+      padding: 120px 5% 60px;
+      gap: 40px;
     }
 
     .hero-content {
-      max-width: 580px;
+      max-width: 600px;
     }
 
     .hero h1 {
-      font-size: 4.2rem;
-      line-height: 1.05;
-      margin-bottom: 18px;
-      background: linear-gradient(90deg, #ffffff, #ff6b00);
+      font-size: 4.5rem;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #fff, #ff6b00);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .hero p {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       opacity: 0.9;
-      margin-bottom: 32px;
+      margin-bottom: 30px;
     }
 
     .buttons {
       display: flex;
-      gap: 16px;
+      gap: 20px;
       flex-wrap: wrap;
     }
 
     .btn {
-      padding: 15px 34px;
+      padding: 16px 36px;
       border-radius: 50px;
-      font-weight: 700;
+      font-weight: bold;
       text-decoration: none;
       transition: all 0.3s;
-      display: inline-block;
     }
 
     .btn-primary {
@@ -139,125 +146,61 @@
 
     .btn-primary:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 25px #ff4500;
+      box-shadow: 0 0 30px #ff4500;
     }
 
     .btn-secondary {
+      background: transparent;
       border: 2px solid #ff6b00;
       color: white;
     }
 
-    .hero-image img {
-      max-width: 480px;
+    .hero-image {
+      max-width: 500px;
       width: 100%;
-      filter: drop-shadow(0 0 35px #ff4500);
+    }
+
+    .hero-image img {
+      width: 100%;
+      filter: drop-shadow(0 0 40px #ff4500);
       animation: float 4s ease-in-out infinite;
     }
 
     @keyframes float {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-18px); }
+      50% { transform: translateY(-20px); }
     }
 
+    /* Stats */
     .stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
-      padding: 50px 5%;
-      background: rgba(0,0,0,0.55);
+      padding: 40px 5%;
+      background: rgba(0,0,0,0.5);
     }
 
     .stat-box {
       text-align: center;
-      padding: 28px 20px;
+      padding: 25px;
+      border: 1px solid #ff450033;
       border-radius: 16px;
-      border: 1px solid rgba(255,69,0,0.25);
-      background: rgba(255,69,0,0.06);
+      background: rgba(255,69,0,0.05);
     }
 
     .stat-box h3 {
-      font-size: 1.9rem;
+      font-size: 1.8rem;
       color: #ff6b00;
-      margin-bottom: 6px;
     }
 
-    section {
-      padding: 90px 5%;
-    }
-
-    .section-title {
-      font-size: 2.6rem;
-      margin-bottom: 15px;
-      background: linear-gradient(90deg, #fff, #ff6b00);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .tokenomics-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      margin-top: 40px;
-    }
-
-    .token-list {
-      list-style: none;
-    }
-
-    .token-list li {
-      display: flex;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      font-size: 1.1rem;
-    }
-
-    .airdrop-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 25px;
-      margin-top: 40px;
-    }
-
-    .airdrop-card {
-      background: rgba(255,69,0,0.08);
-      border: 1px solid rgba(255,69,0,0.3);
-      border-radius: 18px;
-      padding: 30px 25px;
-      text-align: center;
-      transition: 0.3s;
-    }
-
-    .airdrop-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 10px 30px rgba(255,69,0,0.2);
-    }
-
-    .airdrop-card h3 {
-      font-size: 1.6rem;
-      color: #ff6b00;
-      margin: 12px 0;
-    }
-
-    footer {
-      text-align: center;
-      padding: 40px 5%;
-      background: rgba(0,0,0,0.7);
-      font-size: 0.95rem;
-      opacity: 0.8;
-    }
-
+    /* Responsive */
     @media (max-width: 900px) {
       .hero {
         flex-direction: column;
         text-align: center;
-        padding-top: 120px;
       }
       .hero h1 {
-        font-size: 2.8rem;
-      }
-      .tokenomics-grid {
-        grid-template-columns: 1fr;
+        font-size: 3rem;
       }
       .nav-links {
         display: none;
@@ -271,7 +214,7 @@
 
   <nav>
     <div class="logo">
-      <img src="YOUR_LOGO_URL" alt="Logo">
+      <img src="YOUR_LOGO_CAT_URL_HERE" alt="HyperBurner Logo">
       HyperBurner
     </div>
     <div class="nav-links">
@@ -293,7 +236,7 @@
       </div>
     </div>
     <div class="hero-image">
-      <img src="YOUR_CENTER_CAT_URL" alt="HyperBurner Cat">
+      <img src="YOUR_CENTER_CAT_URL_HERE" alt="HyperBurner Cat">
     </div>
   </section>
 
@@ -316,92 +259,32 @@
     </div>
   </section>
 
-  <!-- TOKENOMICS -->
-  <section id="tokenomics">
-    <h2 class="section-title">Tokenomics</h2>
-    <p>Built for long-term growth and fairness.</p>
-
-    <div class="tokenomics-grid">
-      <ul class="token-list">
-        <li><span>Initial Public Burn</span> <strong>32% — 1,600,000</strong></li>
-        <li><span>Liquidity Pool</span> <strong>42% — 2,100,000</strong></li>
-        <li><span>Post-Launch Holder Airdrop</span> <strong>22% — 1,100,000</strong></li>
-        <li><span>Community / Ecosystem</span> <strong>4% — 200,000</strong></li>
-        <li><span>Team</span> <strong>0%</strong></li>
-        <li><span>Marketing</span> <strong>0%</strong></li>
-      </ul>
-
-      <div>
-        <p style="font-size:1.15rem; opacity:0.9;">
-          Fair launch • 0% team allocation • Large initial burn • Strong holder rewards
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- AIRDROP -->
-  <section id="airdrop">
-    <h2 class="section-title">Airdrop Rewards</h2>
-    <p>Hold. Earn. Get Rewarded. Milestone-based rewards for real holders.</p>
-
-    <div class="airdrop-grid">
-      <div class="airdrop-card">
-        <div>1M Market Cap</div>
-        <h3>250,000 HB</h3>
-        <p>Snapshot at 1M MC</p>
-      </div>
-      <div class="airdrop-card">
-        <div>3M Market Cap</div>
-        <h3>150,000 HB</h3>
-        <p>Snapshot at 3M MC</p>
-      </div>
-      <div class="airdrop-card">
-        <div>5M Market Cap</div>
-        <h3>200,000 HB</h3>
-        <p>Snapshot at 5M MC</p>
-      </div>
-      <div class="airdrop-card">
-        <div>Remaining Pool</div>
-        <h3>500,000 HB</h3>
-        <p>Community campaigns</p>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    HyperBurner • Built on Solana • Community Driven • 0% Tax
-  </footer>
+  <!-- You can add Tokenomics + Airdrop sections below the same way -->
 
   <script>
-    // Embers
-    const container = document.getElementById('embers');
-    for (let i = 0; i < 50; i++) {
-      const e = document.createElement('div');
-      e.className = 'ember';
-      e.style.left = Math.random() * 100 + 'vw';
-      e.style.animationDuration = (3 + Math.random() * 4) + 's';
-      e.style.animationDelay = Math.random() * 5 + 's';
-      container.appendChild(e);
+    // Create rising embers
+    const embersContainer = document.getElementById('embers');
+    for (let i = 0; i < 60; i++) {
+      const ember = document.createElement('div');
+      ember.classList.add('ember');
+      ember.style.left = Math.random() * 100 + 'vw';
+      ember.style.animationDuration = (3 + Math.random() * 5) + 's';
+      ember.style.animationDelay = Math.random() * 5 + 's';
+      embersContainer.appendChild(ember);
     }
 
-    // Animations
-    gsap.from(".hero-content", { opacity: 0, x: -60, duration: 1.1 });
-    gsap.from(".hero-image", { opacity: 0, x: 60, duration: 1.1, delay: 0.15 });
-
+    // Simple GSAP animations
+    gsap.from(".hero-content", { opacity: 0, x: -80, duration: 1.2, ease: "power3.out" });
+    gsap.from(".hero-image", { opacity: 0, x: 80, duration: 1.2, ease: "power3.out", delay: 0.2 });
     gsap.from(".stat-box", {
       opacity: 0,
       y: 40,
-      duration: 0.7,
-      stagger: 0.12,
-      scrollTrigger: { trigger: ".stats", start: "top 80%" }
-    });
-
-    gsap.from(".airdrop-card", {
-      opacity: 0,
-      y: 50,
       duration: 0.8,
       stagger: 0.15,
-      scrollTrigger: { trigger: "#airdrop", start: "top 75%" }
+      scrollTrigger: {
+        trigger: ".stats",
+        start: "top 80%"
+      }
     });
   </script>
 </body>
