@@ -1,632 +1,663 @@
 /* =========================================================
    HYPERBURNER — MOTION ENGINE
-   ========================================================= */
+========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+  "use strict";
 
-  /* -------------------------------------------------------
-     1. SCROLL REVEAL SYSTEM
-     ------------------------------------------------------- */
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
 
-  const revealEls = document.querySelectorAll(
-    ".section, .stats, .milestones article, .trans-grid > div, .pool, .community-card"
+  /* =======================================================
+     HELPERS
+  ======================================================= */
+
+  const $ = (selector, parent = document) =>
+    parent.querySelector(selector);
+
+  const $$ = (selector, parent = document) =>
+    [...parent.querySelectorAll(selector)];
+
+  /* =======================================================
+     SCROLL REVEALS
+  ======================================================= */
+
+  const revealTargets = $$(
+    ".section, .stats, .milestones article, .trans-grid > div"
   );
 
-  revealEls.forEach((el) => {
-    el.classList.add("hb-reveal");
-  });
+  if ("IntersectionObserver" in window) {
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
 
-  const revealObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.12,
+        rootMargin: "0px 0px -60px 0px",
+      }
+    );
 
-        entry.target.classList.add("hb-visible");
-        revealObserver.unobserve(entry.target);
-      });
-    },
-    {
-      threshold: 0.12
+    revealTargets.forEach((element, index) => {
+      if (
+        element.matches(".milestones article") ||
+        element.matches(".trans-grid > div")
+      ) {
+        element.style.transitionDelay = `${Math.min(index * 70, 350)}ms`;
+      }
+
+      revealObserver.observe(element);
+    });
+  } else {
+    revealTargets.forEach((element) =>
+      element.classList.add("visible")
+    );
+  }
+
+  /* =======================================================
+     NUMBER COUNTERS
+  ======================================================= */
+
+  const counters = $$("[data-count]");
+
+  function formatNumber(number) {
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 0,
+    }).format(Math.round(number));
+  }
+
+  function animateCounter(element) {
+    if (element.dataset.counted === "true") return;
+
+    element.dataset.counted = "true";
+
+    const target = Number(element.dataset.count);
+
+    if (!Number.isFinite(target)) return;
+
+    if (reduceMotion) {
+      element.textContent = formatNumber(target);
+      return;
     }
-  );
 
-  revealEls.forEach((el) => revealObserver.observe(el));
+    const duration = 1600;
+    const startTime = performance.now();
 
+    function update(now) {
+      const progress = Math.min(
+        (now - startTime) / duration,
+        1
+      );
 
-  /* -------------------------------------------------------
-     2. HERO PARTICLE / EMBER SYSTEM
-     ------------------------------------------------------- */
+      const eased =
+        1 - Math.pow(1 - progress, 4);
 
-  const hero = document.querySelector(".hero");
+      element.textContent = formatNumber(
+        target * eased
+      );
 
-  if (hero) {
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        element.textContent = formatNumber(target);
+      }
+    }
 
-    const particleContainer = document.createElement("div");
-    particleContainer.className = "hb-particles";
+    requestAnimationFrame(update);
+  }
 
-    hero.appendChild(particleContainer);
+  if ("IntersectionObserver" in window) {
+    const counterObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
 
-    for (let i = 0; i < 34; i++) {
+          animateCounter(entry.target);
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.5,
+      }
+    );
 
+    counters.forEach((counter) =>
+      counterObserver.observe(counter)
+    );
+  } else {
+    counters.forEach(animateCounter);
+  }
+
+  /* =======================================================
+     PARTICLE FIELD
+  ======================================================= */
+
+  const particleField = $("#particle-field");
+
+  if (particleField && !reduceMotion) {
+    const particleCount =
+      window.innerWidth < 600 ? 28 : 55;
+
+    for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement("span");
 
       particle.className = "hb-particle";
 
-      const size = Math.random() * 5 + 2;
-      const left = Math.random() * 100;
-      const delay = Math.random() * 8;
-      const duration = Math.random() * 7 + 6;
+      const size =
+        Math.random() * 3.5 + 1;
 
-      particle.style.width = `${size}px`;
-      particle.style.height = `${size}px`;
-      particle.style.left = `${left}%`;
-      particle.style.animationDelay = `${delay}s`;
-      particle.style.animationDuration = `${duration}s`;
+      particle.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size}px;
+        border-radius: 50%;
+        left: ${Math.random() * 100}%;
+        top: ${Math.random() * 100}%;
+        background: rgba(255, ${90 + Math.random() * 120}, 40, ${0.2 + Math.random() * 0.6});
+        box-shadow: 0 0 ${size * 5}px rgba(255,90,20,0.45);
+        pointer-events: none;
+        animation:
+          hbParticleFloat ${8 + Math.random() * 14}s ease-in-out ${Math.random() * -10}s infinite;
+      `;
 
-      particleContainer.appendChild(particle);
+      particleField.appendChild(particle);
     }
+
+    const particleStyle =
+      document.createElement("style");
+
+    particleStyle.textContent = `
+      @keyframes hbParticleFloat {
+        0% {
+          transform: translate3d(0, 0, 0);
+          opacity: 0;
+        }
+
+        15% {
+          opacity: 0.8;
+        }
+
+        50% {
+          transform:
+            translate3d(
+              ${Math.random() * 80 - 40}px,
+              -${40 + Math.random() * 100}px,
+              0
+            );
+        }
+
+        85% {
+          opacity: 0.4;
+        }
+
+        100% {
+          transform:
+            translate3d(
+              ${Math.random() * 120 - 60}px,
+              -${100 + Math.random() * 180}px,
+              0
+            );
+          opacity: 0;
+        }
+      }
+    `;
+
+    document.head.appendChild(particleStyle);
   }
 
+  /* =======================================================
+     HERO EMBERS
+  ======================================================= */
 
-  /* -------------------------------------------------------
-     3. MONEY PARTICLE SYSTEM
-     ------------------------------------------------------- */
+  const flameField = $(".flame-field");
 
-  const heroArt = document.querySelector(".hero-art");
+  if (flameField && !reduceMotion) {
+    const emberCount =
+      window.innerWidth < 600 ? 18 : 34;
 
-  if (heroArt) {
+    for (let i = 0; i < emberCount; i++) {
+      const ember = document.createElement("i");
 
-    const moneyContainer = document.createElement("div");
-    moneyContainer.className = "hb-money-stream";
+      const size =
+        Math.random() * 4 + 2;
 
-    heroArt.appendChild(moneyContainer);
+      ember.style.cssText = `
+        position: absolute;
+        width: ${size}px;
+        height: ${size * (Math.random() * 1.8 + 0.8)}px;
+        left: ${Math.random() * 100}%;
+        top: ${35 + Math.random() * 60}%;
+        border-radius: 50%;
+        background: rgba(255, ${100 + Math.random() * 120}, 40, ${0.35 + Math.random() * 0.65});
+        box-shadow: 0 0 ${size * 4}px rgba(255,80,10,0.7);
+        transform: rotate(${Math.random() * 80 - 40}deg);
+        animation:
+          hbEmber ${2.5 + Math.random() * 4}s ease-in ${Math.random() * -5}s infinite;
+      `;
 
-    for (let i = 0; i < 18; i++) {
-
-      const bill = document.createElement("span");
-
-      bill.className = "hb-bill";
-
-      bill.innerHTML = "$";
-
-      bill.style.setProperty(
-        "--x",
-        `${Math.random() * 260 - 130}px`
-      );
-
-      bill.style.setProperty(
-        "--y",
-        `${Math.random() * 180 - 90}px`
-      );
-
-      bill.style.setProperty(
-        "--r",
-        `${Math.random() * 80 - 40}deg`
-      );
-
-      bill.style.animationDelay = `${Math.random() * 4}s`;
-      bill.style.animationDuration = `${3 + Math.random() * 3}s`;
-
-      moneyContainer.appendChild(bill);
+      flameField.appendChild(ember);
     }
+
+    const emberStyle =
+      document.createElement("style");
+
+    emberStyle.textContent = `
+      @keyframes hbEmber {
+        0% {
+          opacity: 0;
+          transform:
+            translate3d(0, 30px, 0)
+            scale(0.5)
+            rotate(0deg);
+        }
+
+        15% {
+          opacity: 1;
+        }
+
+        70% {
+          opacity: 0.8;
+        }
+
+        100% {
+          opacity: 0;
+          transform:
+            translate3d(
+              ${Math.random() * 100 - 50}px,
+              -${100 + Math.random() * 180}px,
+              0
+            )
+            scale(0)
+            rotate(${Math.random() * 360}deg);
+        }
+      }
+    `;
+
+    document.head.appendChild(emberStyle);
   }
 
+  /* =======================================================
+     MONEY / FIRE PARTICLES
+  ======================================================= */
 
-  /* -------------------------------------------------------
-     4. HERO MOUSE PARALLAX
-     ------------------------------------------------------- */
+  const moneyStream = $(".money-stream");
 
-  const heroImage = document.querySelector(".hero-art > img");
+  if (moneyStream && !reduceMotion) {
+    const moneyCount =
+      window.innerWidth < 600 ? 8 : 15;
 
-  if (hero && heroImage && window.matchMedia("(pointer:fine)").matches) {
+    const symbols = ["$", "HB", "₿"];
 
-    let mouseX = 0;
-    let mouseY = 0;
+    for (let i = 0; i < moneyCount; i++) {
+      const money = document.createElement("span");
 
-    window.addEventListener("mousemove", (event) => {
+      money.textContent =
+        symbols[
+          Math.floor(Math.random() * symbols.length)
+        ];
 
-      const x = event.clientX / window.innerWidth - 0.5;
-      const y = event.clientY / window.innerHeight - 0.5;
+      const size =
+        Math.random() * 10 + 10;
 
-      mouseX = x;
-      mouseY = y;
+      money.style.cssText = `
+        position: absolute;
+        left: ${Math.random() * 100}%;
+        top: ${Math.random() * 100}%;
+        color: rgba(255, ${140 + Math.random() * 100}, 65, ${0.15 + Math.random() * 0.45});
+        font-size: ${size}px;
+        font-weight: 900;
+        filter: blur(${Math.random() > 0.7 ? 0.4 : 0}px);
+        text-shadow: 0 0 15px rgba(255,80,10,0.35);
+        pointer-events: none;
+        user-select: none;
+        animation:
+          hbMoneyFloat ${6 + Math.random() * 8}s ease-in-out ${Math.random() * -8}s infinite;
+      `;
+
+      moneyStream.appendChild(money);
+    }
+
+    const moneyStyle =
+      document.createElement("style");
+
+    moneyStyle.textContent = `
+      @keyframes hbMoneyFloat {
+        0%, 100% {
+          transform:
+            translate3d(0, 0, 0)
+            rotate(0deg);
+          opacity: 0;
+        }
+
+        15% {
+          opacity: 0.7;
+        }
+
+        50% {
+          transform:
+            translate3d(
+              ${Math.random() * 100 - 50}px,
+              -${40 + Math.random() * 100}px,
+              0
+            )
+            rotate(${Math.random() * 80 - 40}deg);
+        }
+
+        85% {
+          opacity: 0.35;
+        }
+      }
+    `;
+
+    document.head.appendChild(moneyStyle);
+  }
+
+  /* =======================================================
+     HERO PARALLAX
+  ======================================================= */
+
+  const heroVisual = $(".hero-visual");
+  const heroImage = $(".hero-visual img");
+
+  if (
+    heroVisual &&
+    heroImage &&
+    !reduceMotion &&
+    window.matchMedia("(pointer: fine)").matches
+  ) {
+    let targetX = 0;
+    let targetY = 0;
+
+    let currentX = 0;
+    let currentY = 0;
+
+    heroVisual.addEventListener("mousemove", (event) => {
+      const rect =
+        heroVisual.getBoundingClientRect();
+
+      const x =
+        (event.clientX - rect.left) /
+          rect.width -
+        0.5;
+
+      const y =
+        (event.clientY - rect.top) /
+          rect.height -
+        0.5;
+
+      targetX = x * 10;
+      targetY = y * 8;
     });
 
-    const animateParallax = () => {
+    heroVisual.addEventListener("mouseleave", () => {
+      targetX = 0;
+      targetY = 0;
+    });
 
-      const moveX = mouseX * 16;
-      const moveY = mouseY * 12;
+    function animateParallax() {
+      currentX +=
+        (targetX - currentX) * 0.06;
+
+      currentY +=
+        (targetY - currentY) * 0.06;
 
       heroImage.style.transform =
-        `translate3d(${moveX}px, ${moveY}px, 0)`;
+        `translate3d(${currentX}px, ${currentY}px, 0)`;
 
       requestAnimationFrame(animateParallax);
-    };
+    }
 
-    animateParallax();
+    requestAnimationFrame(animateParallax);
   }
 
+  /* =======================================================
+     CARD TILT
+  ======================================================= */
 
-  /* -------------------------------------------------------
-     5. SCROLL PARALLAX
-     ------------------------------------------------------- */
+  if (
+    !reduceMotion &&
+    window.matchMedia("(pointer: fine)").matches
+  ) {
+    const tiltCards = $$(
+      ".token-card, .milestones article, .trans-grid > div"
+    );
 
-  if (heroImage) {
+    tiltCards.forEach((card) => {
+      card.addEventListener("mousemove", (event) => {
+        const rect =
+          card.getBoundingClientRect();
+
+        const x =
+          (event.clientX - rect.left) /
+            rect.width -
+          0.5;
+
+        const y =
+          (event.clientY - rect.top) /
+            rect.height -
+          0.5;
+
+        card.style.transform =
+          `perspective(900px)
+           rotateX(${y * -3}deg)
+           rotateY(${x * 3}deg)
+           translateY(-5px)`;
+      });
+
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
+      });
+    });
+  }
+
+  /* =======================================================
+     SMOOTH ANCHOR NAVIGATION
+  ======================================================= */
+
+  $$('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const targetId =
+        link.getAttribute("href");
+
+      if (
+        !targetId ||
+        targetId === "#"
+      ) {
+        return;
+      }
+
+      const target =
+        document.querySelector(targetId);
+
+      if (!target) return;
+
+      event.preventDefault();
+
+      const headerHeight =
+        $(".site-header")?.offsetHeight || 0;
+
+      const top =
+        target.getBoundingClientRect().top +
+        window.scrollY -
+        headerHeight -
+        30;
+
+      window.scrollTo({
+        top,
+        behavior: reduceMotion
+          ? "auto"
+          : "smooth",
+      });
+    });
+  });
+
+  /* =======================================================
+     NAV SCROLL EFFECT
+  ======================================================= */
+
+  const nav = $(".nav");
+
+  if (nav) {
+    const updateNav = () => {
+      if (window.scrollY > 30) {
+        nav.style.borderColor =
+          "rgba(255,255,255,0.12)";
+
+        nav.style.background =
+          "rgba(8,8,8,0.88)";
+      } else {
+        nav.style.borderColor =
+          "rgba(255,255,255,0.08)";
+
+        nav.style.background =
+          "linear-gradient(180deg, rgba(20,20,20,0.82), rgba(8,8,8,0.74))";
+      }
+    };
 
     window.addEventListener(
       "scroll",
-      () => {
-
-        const scrollY = window.scrollY;
-
-        if (scrollY < window.innerHeight * 1.2) {
-
-          const amount = scrollY * 0.08;
-
-          heroImage.style.marginTop = `${amount}px`;
-        }
-      },
+      updateNav,
       { passive: true }
     );
+
+    updateNav();
   }
 
+  /* =======================================================
+     ACTIVE SECTION TRACKING
+  ======================================================= */
 
-  /* -------------------------------------------------------
-     6. ANIMATED COUNTERS
-     ------------------------------------------------------- */
-
-  const counters = document.querySelectorAll("[data-count]");
-
-  const countObserver = new IntersectionObserver(
-    (entries) => {
-
-      entries.forEach((entry) => {
-
-        if (!entry.isIntersecting) return;
-
-        const el = entry.target;
-
-        const target = Number(el.dataset.count);
-
-        if (!Number.isFinite(target)) return;
-
-        const duration = 1600;
-        const startTime = performance.now();
-
-        const animateCounter = (currentTime) => {
-
-          const progress = Math.min(
-            (currentTime - startTime) / duration,
-            1
-          );
-
-          const eased =
-            1 - Math.pow(1 - progress, 4);
-
-          const value =
-            Math.floor(target * eased);
-
-          el.textContent =
-            value.toLocaleString();
-
-          if (progress < 1) {
-            requestAnimationFrame(animateCounter);
-          }
-        };
-
-        requestAnimationFrame(animateCounter);
-
-        countObserver.unobserve(el);
-      });
-    },
-    {
-      threshold: 0.7
-    }
+  const sections = $$(
+    "section[id]"
   );
 
-  counters.forEach((counter) => {
-    countObserver.observe(counter);
-  });
-
-
-  /* -------------------------------------------------------
-     7. TOKENOMICS HOVER MOTION
-     ------------------------------------------------------- */
-
-  const cards = document.querySelectorAll(
-    ".allocation > div, .airdrop article, .trans-grid > div"
+  const navLinks = $$(
+    '.nav-links a[href^="#"]'
   );
 
-  cards.forEach((card) => {
+  if (
+    sections.length &&
+    navLinks.length &&
+    "IntersectionObserver" in window
+  ) {
+    const sectionObserver =
+      new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
 
-    card.addEventListener("mousemove", (event) => {
+            navLinks.forEach((link) => {
+              link.style.color = "";
 
-      const rect = card.getBoundingClientRect();
+              if (
+                link.getAttribute("href") ===
+                `#${entry.target.id}`
+              ) {
+                link.style.color =
+                  "#ffffff";
+              }
+            });
+          });
+        },
+        {
+          rootMargin:
+            "-35% 0px -55% 0px",
+        }
+      );
 
-      const x =
-        (event.clientX - rect.left) / rect.width - 0.5;
-
-      const y =
-        (event.clientY - rect.top) / rect.height - 0.5;
-
-      card.style.transform =
-        `perspective(700px)
-         rotateX(${y * -4}deg)
-         rotateY(${x * 4}deg)
-         translateY(-4px)`;
-    });
-
-    card.addEventListener("mouseleave", () => {
-
-      card.style.transform = "";
-    });
-  });
-
-
-  /* -------------------------------------------------------
-     8. HERO FLAME INTENSITY
-     ------------------------------------------------------- */
-
-  const flames =
-    document.querySelectorAll(".flame");
-
-  flames.forEach((flame, index) => {
-
-    flame.style.animationDelay =
-      `${index * -0.35}s`;
-  });
-
-
-  /* -------------------------------------------------------
-     9. RANDOM AMBIENT EMBERS
-     ------------------------------------------------------- */
-
-  const emberLayer =
-    document.querySelector(".embers");
-
-  if (emberLayer) {
-
-    for (let i = 0; i < 25; i++) {
-
-      const ember =
-        document.createElement("i");
-
-      ember.className =
-        "hb-floating-ember";
-
-      ember.style.left =
-        `${Math.random() * 100}%`;
-
-      ember.style.animationDelay =
-        `${Math.random() * 10}s`;
-
-      ember.style.animationDuration =
-        `${7 + Math.random() * 8}s`;
-
-      emberLayer.appendChild(ember);
-    }
+    sections.forEach((section) =>
+      sectionObserver.observe(section)
+    );
   }
 
+  /* =======================================================
+     DYNAMIC COPYRIGHT YEAR
+  ======================================================= */
 
-  /* -------------------------------------------------------
-     10. SMOOTH ANCHOR NAVIGATION
-     ------------------------------------------------------- */
+  const yearElements =
+    $$("[data-year]");
 
-  document
-    .querySelectorAll('a[href^="#"]')
-    .forEach((link) => {
+  yearElements.forEach((element) => {
+    element.textContent =
+      new Date().getFullYear();
+  });
 
-      link.addEventListener("click", (event) => {
+  /* =======================================================
+     HERO MOUSE GLOW
+  ======================================================= */
 
-        const targetId =
-          link.getAttribute("href");
+  if (
+    heroVisual &&
+    !reduceMotion &&
+    window.matchMedia("(pointer: fine)").matches
+  ) {
+    const glow =
+      document.createElement("div");
 
-        if (!targetId || targetId === "#") return;
+    glow.style.cssText = `
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(
+        circle,
+        rgba(255,105,30,0.12),
+        transparent 68%
+      );
+      filter: blur(10px);
+      transition: opacity 0.3s ease;
+    `;
 
-        const target =
-          document.querySelector(targetId);
+    heroVisual.appendChild(glow);
 
-        if (!target) return;
+    heroVisual.addEventListener(
+      "mousemove",
+      (event) => {
+        const rect =
+          heroVisual.getBoundingClientRect();
 
-        event.preventDefault();
+        glow.style.left =
+          `${event.clientX - rect.left}px`;
 
-        target.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      });
-    });
+        glow.style.top =
+          `${event.clientY - rect.top}px`;
 
+        glow.style.opacity = "1";
+      }
+    );
+
+    heroVisual.addEventListener(
+      "mouseleave",
+      () => {
+        glow.style.opacity = "0";
+      }
+    );
+  }
+
+  /* =======================================================
+     PAGE READY
+  ======================================================= */
+
+  document.documentElement.classList.add(
+    "hb-ready"
+  );
+
+  console.log(
+    "%cHYPERBURNER",
+    "font-size:20px;font-weight:900;color:#ff641c;"
+  );
+
+  console.log(
+    "%cBurn the ordinary.",
+    "font-size:12px;color:#aaa;"
+  );
 });
-
-
-/* =========================================================
-   HYPERBURNER MOTION CSS
-   Injected by JavaScript
-   ========================================================= */
-
-const hbMotionStyle =
-document.createElement("style");
-
-hbMotionStyle.textContent = `
-
-/* Scroll reveals */
-
-.hb-reveal {
-  opacity: 0;
-  transform: translateY(45px) scale(.985);
-  transition:
-    opacity .9s cubic-bezier(.16,1,.3,1),
-    transform .9s cubic-bezier(.16,1,.3,1);
-}
-
-.hb-visible {
-  opacity: 1 !important;
-  transform: none !important;
-}
-
-
-/* Particle field */
-
-.hb-particles {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.hb-particle {
-  position: absolute;
-  bottom: -20px;
-
-  display: block;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      #fff4c2 0%,
-      #ffb000 35%,
-      #ff4d00 70%,
-      transparent 100%
-    );
-
-  box-shadow:
-    0 0 12px #ff7100,
-    0 0 28px rgba(255,80,0,.55);
-
-  opacity: 0;
-
-  animation:
-    hbRise linear infinite;
-}
-
-@keyframes hbRise {
-
-  0% {
-    transform:
-      translate3d(0, 0, 0)
-      scale(.2)
-      rotate(0deg);
-
-    opacity: 0;
-  }
-
-  12% {
-    opacity: .9;
-  }
-
-  50% {
-    transform:
-      translate3d(30px, -45vh, 0)
-      scale(1)
-      rotate(180deg);
-  }
-
-  85% {
-    opacity: .65;
-  }
-
-  100% {
-    transform:
-      translate3d(-30px, -110vh, 0)
-      scale(.1)
-      rotate(360deg);
-
-    opacity: 0;
-  }
-}
-
-
-/* Money stream */
-
-.hb-money-stream {
-  position: absolute;
-  left: 50%;
-  top: 47%;
-
-  width: 1px;
-  height: 1px;
-
-  z-index: 9;
-  pointer-events: none;
-}
-
-.hb-bill {
-  position: absolute;
-
-  width: 54px;
-  height: 29px;
-
-  display: grid;
-  place-items: center;
-
-  border:
-    1px solid rgba(255,220,140,.75);
-
-  border-radius: 4px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ffe18a,
-      #c87519 45%,
-      #ffe8ad
-    );
-
-  color: rgba(78,38,0,.85);
-
-  font-size: 15px;
-  font-weight: 900;
-
-  box-shadow:
-    0 0 20px rgba(255,105,0,.3);
-
-  opacity: 0;
-
-  animation:
-    hbMoneyShoot ease-out infinite;
-}
-
-@keyframes hbMoneyShoot {
-
-  0% {
-    transform:
-      translate3d(0,0,0)
-      rotate(0deg)
-      scale(.35);
-
-    opacity: 0;
-  }
-
-  12% {
-    opacity: 1;
-  }
-
-  55% {
-    transform:
-      translate3d(
-        var(--x),
-        var(--y),
-        0
-      )
-      rotate(var(--r))
-      scale(1);
-  }
-
-  100% {
-    transform:
-      translate3d(
-        calc(var(--x) * 1.9),
-        calc(var(--y) * 2.2),
-        0
-      )
-      rotate(calc(var(--r) * 2))
-      scale(.35);
-
-    opacity: 0;
-  }
-}
-
-
-/* Floating embers */
-
-.hb-floating-ember {
-  position: absolute;
-
-  bottom: -10px;
-
-  width: 3px;
-  height: 3px;
-
-  border-radius: 50%;
-
-  background: #ff8a00;
-
-  box-shadow:
-    0 0 10px #ff6a00,
-    0 0 22px rgba(255,80,0,.5);
-
-  animation:
-    hbEmberRise linear infinite;
-}
-
-@keyframes hbEmberRise {
-
-  0% {
-    transform:
-      translateY(0)
-      translateX(0)
-      scale(.3);
-
-    opacity: 0;
-  }
-
-  15% {
-    opacity: 1;
-  }
-
-  50% {
-    transform:
-      translateY(-50vh)
-      translateX(25px)
-      scale(1);
-  }
-
-  100% {
-    transform:
-      translateY(-110vh)
-      translateX(-30px)
-      scale(.2);
-
-    opacity: 0;
-  }
-}
-
-
-/* Stronger hero breathing */
-
-.hero-art::after {
-  content: "";
-
-  position: absolute;
-
-  width: 70%;
-  height: 70%;
-
-  left: 15%;
-  top: 15%;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(255,115,0,.11),
-      transparent 65%
-    );
-
-  filter: blur(35px);
-
-  animation:
-    hbHeroGlow 3s ease-in-out infinite;
-}
-
-@keyframes hbHeroGlow {
-
-  0%,100% {
-    opacity: .55;
-    transform: scale(.92);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.12);
-  }
-}
-
-`;
-
-document.head.appendChild(hbMotionStyle);
