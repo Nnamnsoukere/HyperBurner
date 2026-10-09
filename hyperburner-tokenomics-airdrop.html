@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HyperBurner: Tokenomics, Airdrop Rules and Transparency</title>
+<style>
+:root{
+  --bg:#05070a; --panel:#0c1118; --line:#1d2733; --text:#e8edf3; --muted:#93a1b2;
+  --flame:#ff8a3d; --ice:#5cc8ff; --burn:#3a2418;
+  --serif:"Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 var(--sans);padding:0 0 4rem}
+section{max-width:60rem;margin:0 auto;padding:4rem 1.25rem 0}
+h2{font:600 clamp(1.8rem,5vw,2.8rem)/1.15 var(--serif);margin:0 0 .75rem;letter-spacing:-.01em}
+h3{font:600 1.15rem/1.3 var(--serif);margin:2rem 0 .5rem}
+p{margin:.5rem 0;max-width:42rem}
+.lead{color:var(--muted);font-size:1.05rem}
+.muted{color:var(--muted)}
+.note{border-left:3px solid var(--ice);padding:.25rem 0 .25rem 1rem;color:var(--muted);margin:1.25rem 0;max-width:42rem}
+
+/* allocation bar: the one memorable element */
+.bar{display:flex;height:3.2rem;border-radius:.4rem;overflow:hidden;margin:2rem 0 .75rem;border:1px solid var(--line);transform-origin:left;animation:grow .9s ease-out both}
+.bar>div{height:100%}
+.b-burn{width:32%;background:repeating-linear-gradient(135deg,var(--burn) 0 8px,#2a1810 8px 16px)}
+.b-lp{width:42%;background:var(--ice)}
+.b-air{width:22%;background:var(--flame)}
+.b-com{width:4%;background:#e8edf3}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.bar{animation:none}}
+.legend{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;font-size:.9rem;color:var(--muted);margin:0 0 1.5rem;padding:0;list-style:none}
+.legend i{display:inline-block;width:.8rem;height:.8rem;border-radius:2px;margin-right:.4rem;vertical-align:-1px}
+
+/* tables */
+.scroll{overflow-x:auto;max-width:100%;border:1px solid var(--line);border-radius:.5rem}
+table{border-collapse:collapse;width:100%;min-width:36rem;font-size:.95rem}
+th,td{padding:.7rem .9rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);background:var(--panel)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tfoot td{font-weight:600;background:var(--panel)}
+
+/* milestones: a real sequence, so numbered */
+.miles{list-style:none;margin:1.5rem 0;padding:0;display:grid;gap:.75rem;counter-reset:m}
+.miles li{counter-increment:m;display:grid;grid-template-columns:2.2rem 1fr auto;align-items:baseline;gap:.75rem;padding:1rem;border:1px solid var(--line);border-radius:.5rem;background:var(--panel)}
+.miles li::before{content:counter(m);font:600 1.3rem var(--serif);color:var(--flame)}
+.miles b{font:600 1.2rem var(--serif)}
+.miles .amt{font-variant-numeric:tabular-nums;font-weight:600;color:var(--flame)}
+.miles small{display:block;color:var(--muted)}
+.pool{padding:1rem;border:1px dashed var(--line);border-radius:.5rem;margin-top:.75rem}
+
+/* rules */
+dl{margin:1.5rem 0;display:grid;gap:1.25rem}
+dt{font:600 1.05rem var(--serif)}
+dd{margin:.25rem 0 0;color:var(--muted);max-width:42rem}
+dd b{color:var(--text)}
+.ex{background:var(--panel);border:1px solid var(--line);border-radius:.5rem;padding:1rem;margin-top:.75rem;color:var(--text)}
+
+/* verification list */
+.checks{list-style:none;margin:1.25rem 0;padding:0;display:grid;gap:.5rem}
+.checks li{display:flex;justify-content:space-between;gap:1rem;padding:.7rem .9rem;border:1px solid var(--line);border-radius:.5rem}
+.tag{font-size:.85rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--flame);color:var(--flame);white-space:nowrap;align-self:center}
+.tag.done{border-color:var(--ice);color:var(--ice)}
+@media (max-width:30rem){.miles li{grid-template-columns:1.6rem 1fr}.miles .amt{grid-column:2}}
+:focus-visible{outline:2px solid var(--ice);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<!-- ===================== TOKENOMICS ===================== -->
+<section id="tokenomics">
+  <h2>Where every HB goes</h2>
+  <p class="lead">5,000,000 HB are created once. 1,600,000 are burned at launch, so 3,400,000 HB will exist. Nothing is set aside for a team or a marketing wallet.</p>
+
+  <div class="bar" role="img" aria-label="Allocation of 5,000,000 HB: 32% burn, 42% liquidity, 22% airdrop, 4% community">
+    <div class="b-burn"></div><div class="b-lp"></div><div class="b-air"></div><div class="b-com"></div>
+  </div>
+  <ul class="legend">
+    <li><i style="background:var(--burn);border:1px solid #6b4430"></i>Burned 32%</li>
+    <li><i style="background:var(--ice)"></i>Liquidity 42%</li>
+    <li><i style="background:var(--flame)"></i>Airdrop 22%</li>
+    <li><i style="background:#e8edf3"></i>Community 4%</li>
+  </ul>
+
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Allocation</th><th class="n">HB</th><th class="n">Of 5M</th><th class="n">Of 3.4M after burn</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>Initial public burn</td><td class="n">1,600,000</td><td class="n">32%</td><td class="n">n/a</td><td>Burned with Solana's burn instruction, so explorers show the supply falling to 3,400,000.</td></tr>
+      <tr><td>Liquidity pool</td><td class="n">2,100,000</td><td class="n">42%</td><td class="n">≈61.8%</td><td>Paired with SOL at launch. The LP tokens are burned, so the liquidity can never be withdrawn.</td></tr>
+      <tr><td>Post-launch holder airdrop</td><td class="n">1,100,000</td><td class="n">22%</td><td class="n">≈32.4%</td><td>Held in a public multisig wallet until each snapshot. See the airdrop rules below.</td></tr>
+      <tr><td>Community / ecosystem</td><td class="n">200,000</td><td class="n">4%</td><td class="n">≈5.9%</td><td>Held in a public wallet. Any use is announced before the tokens move.</td></tr>
+      <tr><td>Team</td><td class="n">0</td><td class="n">0%</td><td class="n">0%</td><td>No allocation.</td></tr>
+      <tr><td>Marketing</td><td class="n">0</td><td class="n">0%</td><td class="n">0%</td><td>No marketing wallet. Campaign rewards come only from the airdrop pool.</td></tr>
+    </tbody>
+    <tfoot><tr><td>Total</td><td class="n">5,000,000</td><td class="n">100%</td><td class="n"></td><td></td></tr></tfoot>
+  </table>
+  </div>
+  <p class="muted" style="font-size:.9rem">Percentages after the burn are rounded.</p>
+  <p class="note">At launch the mint authority and freeze authority are revoked. That means no one can create more HB or freeze a holder's wallet. The transaction links are published here once they exist.</p>
+</section>
+
+<!-- ===================== AIRDROPS ===================== -->
+<section id="airdrops">
+  <h2>Airdrops, with the rules written first</h2>
+  <p class="lead">The airdrop pool is 1,100,000 HB (22% of supply). Three milestone rewards are fixed. The rest is a campaign pool whose exact splits are announced before each campaign opens.</p>
+
+  <ol class="miles">
+    <li><div><b>$1M market cap</b><small>Snapshot after the milestone is confirmed</small></div><span class="amt">250,000 HB</span></li>
+    <li><div><b>$3M market cap</b><small>Snapshot after the milestone is confirmed</small></div><span class="amt">150,000 HB</span></li>
+    <li><div><b>$5M market cap</b><small>Snapshot after the milestone is confirmed</small></div><span class="amt">200,000 HB</span></li>
+  </ol>
+  <div class="pool"><b>Campaign pool: 500,000 HB.</b> <span class="muted">Creators, referrals, top holders and other campaigns. Category amounts are not decided yet and will be announced before each campaign. The total can never exceed 500,000 HB, and no new tokens are ever created for it.</span></div>
+
+  <h3>How the airdrop works</h3>
+  <dl>
+    <!-- CONFIRM: all values below marked (proposed) in the chat summary are rules to approve or change before publishing -->
+    <div>
+      <dt>When a milestone counts</dt>
+      <dd>Market cap means the HB price on the main HB/SOL pool multiplied by the circulating supply, which is total supply minus burned HB (3,400,000 HB). We read it from <b>DexScreener</b>. A milestone is confirmed only when the market cap stays above the target for <b>24 hours in a row</b>, so a short spike does not trigger it.</dd>
+    </div>
+    <div>
+      <dt>Who qualifies</dt>
+      <dd>A wallet needs <b>at least 2,000 HB</b>, and its balance must have stayed at or above 2,000 HB for the <b>7 days before the snapshot</b>. Each wallet is counted on its own, so splitting tokens across many wallets does not add up. Buying just before a snapshot does not qualify.</dd>
+    </div>
+    <div>
+      <dt>Who is excluded</dt>
+      <dd>The liquidity pool and its vaults, the burn address, and the project's airdrop and community wallets are excluded, along with any exchange-owned wallets. Without this, the pool itself would count as the largest holder and take most of every reward. The full excluded list is published before the first snapshot.</dd>
+    </div>
+    <div>
+      <dt>How rewards are split</dt>
+      <dd>Each qualifying wallet gets a share of the milestone pool in proportion to its HB balance, and <b>no single wallet can receive more than 2% of a milestone pool</b> (5,000 HB at $1M, 3,000 HB at $3M, 4,000 HB at $5M). The leftover from capped wallets is shared among the other qualifying wallets.
+        <div class="ex"><b>Example.</b> Suppose all qualifying wallets together hold 400,000 HB at the $1M snapshot. A wallet holding 4,000 HB owns 1% of that total, so it receives 1% of 250,000 HB, which is 2,500 HB. The numbers are only an illustration.</div></dd>
+    </div>
+    <div>
+      <dt>Where the tokens wait</dt>
+      <dd>The 1,100,000 HB sit in a multisig wallet whose address is public from day one. After each distribution we publish the snapshot data and the transaction links so anyone can check the result.</dd>
+    </div>
+    <div>
+      <dt>Changes to the rules</dt>
+      <dd>These rules are final once published. Any change is announced publicly before the next snapshot is scheduled, and never changes a snapshot that has already been taken.</dd>
+    </div>
+  </dl>
+
+  <p class="note">Airdrops depend on the market-cap milestones being reached and are not guaranteed. HB is a community token, not an investment, and its price can fall to zero.</p>
+</section>
+
+<!-- ===================== TRANSPARENCY ===================== -->
+<section id="transparency">
+  <h2>Don't trust us. Check the chain.</h2>
+  <p class="lead">Before launch, nothing below exists on-chain, so everything is marked pending. Each item gets a Solana Explorer link the moment it is real.</p>
+
+  <ul class="checks">
+    <li><span>HB mint address</span><span class="tag">Pending launch</span></li>
+    <li><span>Burn of 1,600,000 HB</span><span class="tag">Pending launch</span></li>
+    <li><span>2,100,000 HB liquidity pool and LP token burn</span><span class="tag">Pending launch</span></li>
+    <li><span>Mint authority and freeze authority revoked</span><span class="tag">Pending launch</span></li>
+    <li><span>Airdrop multisig and community wallet addresses</span><span class="tag">Pending launch</span></li>
+    <li><span>Excluded wallet list</span><span class="tag">Before first snapshot</span></li>
+    <li><span>Snapshot records and distribution transactions</span><span class="tag">After each milestone</span></li>
+  </ul>
+  <p class="muted">The only official announcements come from our X and Telegram accounts. We will never ask for your seed phrase or send you a direct message first.</p>
+</section>
+
+</body>
+</html>
